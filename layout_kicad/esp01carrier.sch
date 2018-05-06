@@ -1,0 +1,596 @@
+EESchema Schematic File Version 4
+LIBS:esp01carrier-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text GLabel 1700 1400 0    60   Input ~ 0
+REED1
+$Comp
+L esp01carrier-rescue:CP C1
+U 1 1 5AE6FD06
+P 1300 3450
+F 0 "C1" H 1325 3550 50  0000 L CNN
+F 1 "100uF" H 1325 3350 50  0000 L CNN
+F 2 "Capacitors_THT:CP_Radial_D7.5mm_P2.50mm" H 1338 3300 50  0001 C CNN
+F 3 "" H 1300 3450 50  0001 C CNN
+	1    1300 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:CP C2
+U 1 1 5AE6FD45
+P 1900 3450
+F 0 "C2" H 1925 3550 50  0000 L CNN
+F 1 "100uF" H 1925 3350 50  0000 L CNN
+F 2 "Capacitors_THT:CP_Radial_D7.5mm_P2.50mm" H 1938 3300 50  0001 C CNN
+F 3 "" H 1900 3450 50  0001 C CNN
+	1    1900 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:CP C3
+U 1 1 5AE6FD86
+P 4100 2250
+F 0 "C3" H 4125 2350 50  0000 L CNN
+F 1 "10uF" H 4125 2150 50  0000 L CNN
+F 2 "Capacitors_THT:CP_Radial_D6.3mm_P2.50mm" H 4138 2100 50  0001 C CNN
+F 3 "" H 4100 2250 50  0001 C CNN
+	1    4100 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR01
+U 1 1 5AE6FDA5
+P 1300 3600
+F 0 "#PWR01" H 1300 3350 50  0001 C CNN
+F 1 "GND" H 1300 3450 50  0000 C CNN
+F 2 "" H 1300 3600 50  0001 C CNN
+F 3 "" H 1300 3600 50  0001 C CNN
+	1    1300 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR02
+U 1 1 5AE6FDE3
+P 4100 2400
+F 0 "#PWR02" H 4100 2150 50  0001 C CNN
+F 1 "GND" H 4100 2250 50  0000 C CNN
+F 2 "" H 4100 2400 50  0001 C CNN
+F 3 "" H 4100 2400 50  0001 C CNN
+	1    4100 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:R R1
+U 1 1 5AE6FDFF
+P 1300 3150
+F 0 "R1" V 1380 3150 50  0000 C CNN
+F 1 "10k" V 1300 3150 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 1230 3150 50  0001 C CNN
+F 3 "" H 1300 3150 50  0001 C CNN
+	1    1300 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:R R2
+U 1 1 5AE6FE30
+P 1900 3150
+F 0 "R2" V 1980 3150 50  0000 C CNN
+F 1 "10k" V 1900 3150 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 1830 3150 50  0001 C CNN
+F 3 "" H 1900 3150 50  0001 C CNN
+	1    1900 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:R R3
+U 1 1 5AE6FE6B
+P 4100 1950
+F 0 "R3" V 4180 1950 50  0000 C CNN
+F 1 "10k" V 4100 1950 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 4030 1950 50  0001 C CNN
+F 3 "" H 4100 1950 50  0001 C CNN
+	1    4100 1950
+	1    0    0    -1  
+$EndComp
+Text GLabel 1300 3000 1    60   Input ~ 0
+REED1
+Text GLabel 1900 3000 1    60   Input ~ 0
+REED2
+$Comp
+L esp01carrier-rescue:74LS86 U1
+U 1 1 5AE70641
+P 2300 1500
+F 0 "U1" H 2350 1550 50  0000 C CNN
+F 1 "CD74HCT86E" H 2350 1450 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 2300 1500 50  0001 C CNN
+F 3 "" H 2300 1500 50  0001 C CNN
+	1    2300 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:74LS86 U1
+U 2 1 5AE7069E
+P 2300 2150
+F 0 "U1" H 2350 2200 50  0000 C CNN
+F 1 "CD74HCT86E" H 2350 2100 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 2300 2150 50  0001 C CNN
+F 3 "" H 2300 2150 50  0001 C CNN
+	2    2300 2150
+	1    0    0    -1  
+$EndComp
+Text GLabel 1700 2250 0    60   Input ~ 0
+REED2
+$Comp
+L esp01carrier-rescue:74LS32 U2
+U 1 1 5AE708D3
+P 5200 2900
+F 0 "U2" H 5200 2950 50  0000 C CNN
+F 1 "SN74HCT32N" H 5200 2850 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 5200 2900 50  0001 C CNN
+F 3 "" H 5200 2900 50  0001 C CNN
+	1    5200 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:74LS86 U1
+U 3 1 5AE709BE
+P 4700 1700
+F 0 "U1" H 4750 1750 50  0000 C CNN
+F 1 "CD74HCT86E" H 4750 1650 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 4700 1700 50  0001 C CNN
+F 3 "" H 4700 1700 50  0001 C CNN
+	3    4700 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+3.3V #PWR03
+U 1 1 5AE70A09
+P 4100 1600
+F 0 "#PWR03" H 4100 1450 50  0001 C CNN
+F 1 "+3.3V" H 4100 1740 50  0000 C CNN
+F 2 "" H 4100 1600 50  0001 C CNN
+F 3 "" H 4100 1600 50  0001 C CNN
+	1    4100 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:74LS32 U2
+U 2 1 5AE70A45
+P 5300 2200
+F 0 "U2" H 5300 2250 50  0000 C CNN
+F 1 "SN74HCT32N" H 5300 2150 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 5300 2200 50  0001 C CNN
+F 3 "" H 5300 2200 50  0001 C CNN
+	2    5300 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:74LS32 U2
+U 3 1 5AE70A9C
+P 3500 1800
+F 0 "U2" H 3500 1850 50  0000 C CNN
+F 1 "SN74HCT32N" H 3500 1750 50  0000 C CNN
+F 2 "Housings_DIP:DIP-14_W7.62mm" H 3500 1800 50  0001 C CNN
+F 3 "" H 3500 1800 50  0001 C CNN
+	3    3500 1800
+	1    0    0    -1  
+$EndComp
+Text GLabel 4700 2300 0    60   Input ~ 0
+REED1
+Text GLabel 4600 3000 0    60   Input ~ 0
+REED2
+Wire Wire Line
+	1150 3300 1300 3300
+Wire Wire Line
+	1150 1600 1700 1600
+Wire Wire Line
+	1700 3300 1900 3300
+Wire Wire Line
+	2900 1900 2900 2150
+Wire Wire Line
+	3800 2100 4100 2100
+Wire Wire Line
+	4600 2800 3800 2800
+Wire Wire Line
+	3800 2800 3800 2100
+Connection ~ 4100 2100
+Wire Wire Line
+	1150 1600 1150 3300
+Text GLabel 5300 1700 2    60   Input ~ 0
+RST
+Text GLabel 5800 2900 2    60   Input ~ 0
+GPIO0
+$Comp
+L esp01carrier-rescue:Conn_02x04_Odd_Even J1
+U 1 1 5AE716ED
+P 2800 2850
+F 0 "J1" H 2850 3050 50  0000 C CNN
+F 1 "ESP-01" H 2850 2550 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_2x04_Pitch2.54mm" H 2800 2850 50  0001 C CNN
+F 3 "" H 2800 2850 50  0001 C CNN
+	1    2800 2850
+	1    0    0    -1  
+$EndComp
+Text GLabel 3100 2950 2    60   Input ~ 0
+GPIO0
+$Comp
+L esp01carrier-rescue:GND #PWR04
+U 1 1 5AE71BD4
+P 3600 2750
+F 0 "#PWR04" H 3600 2500 50  0001 C CNN
+F 1 "GND" H 3600 2600 50  0000 C CNN
+F 2 "" H 3600 2750 50  0001 C CNN
+F 3 "" H 3600 2750 50  0001 C CNN
+	1    3600 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3100 2750 3600 2750
+Text GLabel 2600 2950 0    60   Input ~ 0
+RST
+$Comp
+L esp01carrier-rescue:+3.3V #PWR05
+U 1 1 5AE71F6E
+P 2250 2850
+F 0 "#PWR05" H 2250 2700 50  0001 C CNN
+F 1 "+3.3V" H 2250 2990 50  0000 C CNN
+F 2 "" H 2250 2850 50  0001 C CNN
+F 3 "" H 2250 2850 50  0001 C CNN
+	1    2250 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 2850 2600 2850
+Wire Wire Line
+	2250 3050 2600 3050
+NoConn ~ 2600 2750
+$Comp
+L esp01carrier-rescue:Conn_01x02 J2
+U 1 1 5AE7231B
+P 3450 3600
+F 0 "J2" H 3450 3700 50  0000 C CNN
+F 1 "REED1" H 3650 3400 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 3450 3600 50  0001 C CNN
+F 3 "" H 3450 3600 50  0001 C CNN
+	1    3450 3600
+	1    0    0    -1  
+$EndComp
+Text GLabel 3000 3700 0    60   Input ~ 0
+REED1
+$Comp
+L esp01carrier-rescue:+3.3V #PWR06
+U 1 1 5AE72397
+P 3050 3400
+F 0 "#PWR06" H 3050 3250 50  0001 C CNN
+F 1 "+3.3V" H 3050 3540 50  0000 C CNN
+F 2 "" H 3050 3400 50  0001 C CNN
+F 3 "" H 3050 3400 50  0001 C CNN
+	1    3050 3400
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:Conn_01x02 J3
+U 1 1 5AE725C2
+P 4650 3600
+F 0 "J3" H 4650 3700 50  0000 C CNN
+F 1 "REED2" H 4850 3400 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 4650 3600 50  0001 C CNN
+F 3 "" H 4650 3600 50  0001 C CNN
+	1    4650 3600
+	1    0    0    -1  
+$EndComp
+Text GLabel 4200 3700 0    60   Input ~ 0
+REED2
+$Comp
+L esp01carrier-rescue:+3.3V #PWR07
+U 1 1 5AE725C9
+P 4250 3400
+F 0 "#PWR07" H 4250 3250 50  0001 C CNN
+F 1 "+3.3V" H 4250 3540 50  0000 C CNN
+F 2 "" H 4250 3400 50  0001 C CNN
+F 3 "" H 4250 3400 50  0001 C CNN
+	1    4250 3400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 1500 2900 1700
+$Comp
+L esp01carrier-rescue:+3.3V #PWR08
+U 1 1 5AE73145
+P 2250 3050
+F 0 "#PWR08" H 2250 2900 50  0001 C CNN
+F 1 "+3.3V" H 2250 3190 50  0000 C CNN
+F 2 "" H 2250 3050 50  0001 C CNN
+F 3 "" H 2250 3050 50  0001 C CNN
+	1    2250 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+3.3V #PWR09
+U 1 1 5AE733F4
+P 2100 1300
+F 0 "#PWR09" H 2100 1150 50  0001 C CNN
+F 1 "+3.3V" H 2100 1440 50  0000 C CNN
+F 2 "" H 2100 1300 50  0001 C CNN
+F 3 "" H 2100 1300 50  0001 C CNN
+	1    2100 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR010
+U 1 1 5AE73536
+P 1900 3600
+F 0 "#PWR010" H 1900 3350 50  0001 C CNN
+F 1 "GND" H 1900 3450 50  0000 C CNN
+F 2 "" H 1900 3600 50  0001 C CNN
+F 3 "" H 1900 3600 50  0001 C CNN
+	1    1900 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR011
+U 1 1 5AE735F3
+P 2100 1700
+F 0 "#PWR011" H 2100 1450 50  0001 C CNN
+F 1 "GND" H 2100 1550 50  0000 C CNN
+F 2 "" H 2100 1700 50  0001 C CNN
+F 3 "" H 2100 1700 50  0001 C CNN
+	1    2100 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+3.3V #PWR012
+U 1 1 5AE73E79
+P 3300 1600
+F 0 "#PWR012" H 3300 1450 50  0001 C CNN
+F 1 "+3.3V" H 3300 1740 50  0000 C CNN
+F 2 "" H 3300 1600 50  0001 C CNN
+F 3 "" H 3300 1600 50  0001 C CNN
+	1    3300 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR013
+U 1 1 5AE744B6
+P 3300 2000
+F 0 "#PWR013" H 3300 1750 50  0001 C CNN
+F 1 "GND" H 3300 1850 50  0000 C CNN
+F 2 "" H 3300 2000 50  0001 C CNN
+F 3 "" H 3300 2000 50  0001 C CNN
+	1    3300 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:PWR_FLAG #FLG014
+U 1 1 5AE747B1
+P 5750 3500
+F 0 "#FLG014" H 5750 3575 50  0001 C CNN
+F 1 "PWR_FLAG" H 5750 3650 50  0000 C CNN
+F 2 "" H 5750 3500 50  0001 C CNN
+F 3 "" H 5750 3500 50  0001 C CNN
+	1    5750 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR015
+U 1 1 5AE74894
+P 5750 3500
+F 0 "#PWR015" H 5750 3250 50  0001 C CNN
+F 1 "GND" H 5750 3350 50  0000 C CNN
+F 2 "" H 5750 3500 50  0001 C CNN
+F 3 "" H 5750 3500 50  0001 C CNN
+	1    5750 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1700 2050 1300 2050
+Wire Wire Line
+	1300 2050 1300 2400
+Wire Wire Line
+	1300 2400 1700 2400
+Wire Wire Line
+	1700 2400 1700 3300
+$Comp
+L esp01carrier-rescue:GND #PWR016
+U 1 1 5AE79A37
+P 1550 4400
+F 0 "#PWR016" H 1550 4150 50  0001 C CNN
+F 1 "GND" H 1550 4250 50  0000 C CNN
+F 2 "" H 1550 4400 50  0001 C CNN
+F 3 "" H 1550 4400 50  0001 C CNN
+	1    1550 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+3.3V #PWR017
+U 1 1 5AE79A6B
+P 1900 4100
+F 0 "#PWR017" H 1900 3950 50  0001 C CNN
+F 1 "+3.3V" H 1900 4240 50  0000 C CNN
+F 2 "" H 1900 4100 50  0001 C CNN
+F 3 "" H 1900 4100 50  0001 C CNN
+	1    1900 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+5V #PWR018
+U 1 1 5AE79A9F
+P 1200 4100
+F 0 "#PWR018" H 1200 3950 50  0001 C CNN
+F 1 "+5V" H 1200 4240 50  0000 C CNN
+F 2 "" H 1200 4100 50  0001 C CNN
+F 3 "" H 1200 4100 50  0001 C CNN
+	1    1200 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:CP C4
+U 1 1 5AE79AD3
+P 1200 4250
+F 0 "C4" H 1225 4350 50  0000 L CNN
+F 1 "10uF" H 1225 4150 50  0000 L CNN
+F 2 "Capacitors_THT:CP_Radial_D5.0mm_P2.50mm" H 1238 4100 50  0001 C CNN
+F 3 "" H 1200 4250 50  0001 C CNN
+	1    1200 4250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1200 4400 1550 4400
+$Comp
+L esp01carrier-rescue:CP C5
+U 1 1 5AE79B73
+P 1900 4250
+F 0 "C5" H 1925 4350 50  0000 L CNN
+F 1 "100uF" H 1925 4150 50  0000 L CNN
+F 2 "Capacitors_THT:CP_Radial_D6.3mm_P2.50mm" H 1938 4100 50  0001 C CNN
+F 3 "" H 1900 4250 50  0001 C CNN
+	1    1900 4250
+	1    0    0    -1  
+$EndComp
+Connection ~ 1550 4400
+$Comp
+L esp01carrier-rescue:Conn_01x02 J4
+U 1 1 5AE79CD4
+P 2600 4100
+F 0 "J4" H 2600 4200 50  0000 C CNN
+F 1 "Vin 5V" H 2750 3900 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 2600 4100 50  0001 C CNN
+F 3 "" H 2600 4100 50  0001 C CNN
+	1    2600 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:+5V #PWR019
+U 1 1 5AE79D73
+P 2400 4100
+F 0 "#PWR019" H 2400 3950 50  0001 C CNN
+F 1 "+5V" H 2400 4240 50  0000 C CNN
+F 2 "" H 2400 4100 50  0001 C CNN
+F 3 "" H 2400 4100 50  0001 C CNN
+	1    2400 4100
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR020
+U 1 1 5AE79DAD
+P 2400 4200
+F 0 "#PWR020" H 2400 3950 50  0001 C CNN
+F 1 "GND" H 2400 4050 50  0000 C CNN
+F 2 "" H 2400 4200 50  0001 C CNN
+F 3 "" H 2400 4200 50  0001 C CNN
+	1    2400 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:PWR_FLAG #FLG021
+U 1 1 5AE79DE7
+P 5300 3500
+F 0 "#FLG021" H 5300 3575 50  0001 C CNN
+F 1 "PWR_FLAG" H 5300 3650 50  0000 C CNN
+F 2 "" H 5300 3500 50  0001 C CNN
+F 3 "" H 5300 3500 50  0001 C CNN
+	1    5300 3500
+	-1   0    0    1   
+$EndComp
+$Comp
+L esp01carrier-rescue:+5V #PWR022
+U 1 1 5AE79E21
+P 5300 3500
+F 0 "#PWR022" H 5300 3350 50  0001 C CNN
+F 1 "+5V" H 5300 3640 50  0000 C CNN
+F 2 "" H 5300 3500 50  0001 C CNN
+F 3 "" H 5300 3500 50  0001 C CNN
+	1    5300 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:R R4
+U 1 1 5AE85495
+P 3050 3550
+F 0 "R4" V 3130 3550 50  0000 C CNN
+F 1 "10k" V 3050 3550 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 2980 3550 50  0001 C CNN
+F 3 "" H 3050 3550 50  0001 C CNN
+	1    3050 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:R R5
+U 1 1 5AE854E6
+P 4250 3550
+F 0 "R5" V 4330 3550 50  0000 C CNN
+F 1 "10k" V 4250 3550 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 4180 3550 50  0001 C CNN
+F 3 "" H 4250 3550 50  0001 C CNN
+	1    4250 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR023
+U 1 1 5AE85C8A
+P 3250 3600
+F 0 "#PWR023" H 3250 3350 50  0001 C CNN
+F 1 "GND" H 3250 3450 50  0000 C CNN
+F 2 "" H 3250 3600 50  0001 C CNN
+F 3 "" H 3250 3600 50  0001 C CNN
+	1    3250 3600
+	-1   0    0    1   
+$EndComp
+$Comp
+L esp01carrier-rescue:GND #PWR024
+U 1 1 5AE85CC8
+P 4450 3600
+F 0 "#PWR024" H 4450 3350 50  0001 C CNN
+F 1 "GND" H 4450 3450 50  0000 C CNN
+F 2 "" H 4450 3600 50  0001 C CNN
+F 3 "" H 4450 3600 50  0001 C CNN
+	1    4450 3600
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4200 3700 4250 3700
+Wire Wire Line
+	3000 3700 3050 3700
+Connection ~ 4250 3700
+Connection ~ 3050 3700
+Text GLabel 3100 3050 2    60   Input ~ 0
+RX
+NoConn ~ 3100 2850
+Text GLabel 5900 2200 2    60   Input ~ 0
+RX
+$Comp
+L esp01carrier-rescue:MCP1700-3302E_SOT89 U3
+U 1 1 5AE872C0
+P 1550 4100
+F 0 "U3" H 1400 4250 50  0000 C CNN
+F 1 "HT7333" H 1500 4250 50  0000 L CNN
+F 2 "TO_SOT_Packages_THT:TO-262_I2PAK_Vertical" H 1550 4300 50  0001 C CNN
+F 3 "" H 1550 4050 50  0001 C CNN
+	1    1550 4100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1850 4100 1900 4100
+Wire Wire Line
+	1250 4100 1200 4100
+Wire Wire Line
+	4100 2100 4700 2100
+Wire Wire Line
+	1550 4400 1900 4400
+Wire Wire Line
+	4250 3700 4450 3700
+Wire Wire Line
+	3050 3700 3250 3700
+$EndSCHEMATC
