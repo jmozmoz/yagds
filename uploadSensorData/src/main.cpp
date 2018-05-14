@@ -8,24 +8,27 @@ const unsigned int upperReed = 0;     // GPIO0
 const unsigned int lowerReed = 3;     // RX
 
 const unsigned int REED_INTERVAL = 2;
-const unsigned int SLEEP_INTERVAL = 2;
+const unsigned int CONNECTION_TIMEOUT = 60;
+const unsigned int SLEEP_TIMEOUT = 10;
 
 unsigned long lastReedSent = 0;
+unsigned long sleepStarted = 0;
+unsigned long startupTime = 0;
 
-bool prepareSleepFlag = false;
 bool doSleepFlag = false;
 bool reachedSleepFlag = false;
 
-unsigned long sleepCounter = 0;
+bool waitForConnection = true;
 
 HomieNode reedNode("reeds", "state");
 HomieNode vccNode("powerSupply", "voltage");
 
 void checkGotoSleep(int upperReedState, int lowerReedState) {
-  if ((!(upperReedState) || !(lowerReedState)) && !prepareSleepFlag) {
-    Homie.getLogger() << "Want to sleep" << endl;
-    prepareSleepFlag = true;
-    sleepCounter = millis();
+  if (!upperReedState || !lowerReedState) {
+    sleepStarted = millis();
+    Homie.getLogger() << F("Prepare to sleep") << endl;
+    doSleepFlag = true;
+    Homie.prepareToSleep();
   }
 }
 
@@ -34,9 +37,9 @@ void publishStates() {
   int lowerReedState = digitalRead(lowerReed);
   uint16_t voltage = ESP.getVcc();
   
-  Homie.getLogger() << "Upper reed: " << upperReedState << endl;
-  Homie.getLogger() << "Lower reed: " << lowerReedState << endl;
-  Homie.getLogger() << "Voltage: " << voltage << endl;
+  Homie.getLogger() << F("Upper reed: ") << upperReedState << endl;
+  Homie.getLogger() << F("Lower reed: ") << lowerReedState << endl;
+  Homie.getLogger() << F("Voltage: ") << voltage << endl;
 
   reedNode.setProperty("upperReed").send(String(upperReedState));
   reedNode.setProperty("lowerReed").send(String(lowerReedState));
@@ -47,29 +50,22 @@ void publishStates() {
 
 void loopHandler() {
   if (millis() - lastReedSent >= REED_INTERVAL * 1000UL || lastReedSent == 0) {
-    Homie.getLogger() << "start loop " << endl;
-
     publishStates();
-
     lastReedSent = millis();
-    Homie.getLogger() << "stop loop " << endl;
-  }
-
-  if (prepareSleepFlag && (millis() - sleepCounter >= SLEEP_INTERVAL * 1000UL)) {
-    doSleepFlag = true;
-    prepareSleepFlag = false;
-    Homie.prepareToSleep();
   }
 }
 
 void onHomieEvent(const HomieEvent& event) {
   switch(event.type) {
     case HomieEventType::MQTT_READY:
-      // Do whatever you want when MQTT is connected in normal mode
-      publishStates();
+      waitForConnection = false;
+      break;
+    case HomieEventType::MQTT_DISCONNECTED:
+      waitForConnection = true;
+      startupTime = millis();
       break;
     case HomieEventType::READY_TO_SLEEP:
-      Homie.getLogger() << "Ready to sleep" << endl;
+      Homie.getLogger() << F("Ready to sleep") << endl;
       reachedSleepFlag = true;
       break;
     default:
@@ -79,14 +75,16 @@ void onHomieEvent(const HomieEvent& event) {
 
 void setup() {
   Homie.disableLedFeedback();
+  Homie.disableResetTrigger();  // we do not want to trigger config mode by sensor input
   Serial.begin(115200);
   Serial << endl << endl;
+
+  startupTime = millis();
 
   pinMode(upperReed, INPUT);
   pinMode(lowerReed, INPUT_PULLUP);
   
   Homie_setFirmware("uploadSensorData", "1.0.0"); // The underscore is not a typo! See Magic bytes
-  Homie.disableResetTrigger(); // before Homie.setup()
 
   Homie.setLoopFunction(loopHandler);
   Homie.onEvent(onHomieEvent);
@@ -101,8 +99,15 @@ void setup() {
 }
 
 void loop() {
-  if (reachedSleepFlag) {
-    //Homie.getLogger() << "Really goto sleep" << endl;   
+  if (waitForConnection && millis() - startupTime > CONNECTION_TIMEOUT * 1000UL) {
+    Homie.getLogger() << F("Initiate go to sleep, because connection timeout was reached") << endl;
+    Homie.prepareToSleep();
+  }
+
+  if (reachedSleepFlag || 
+    (doSleepFlag && (millis() - sleepStarted >= SLEEP_TIMEOUT * 1000UL))
+    ) {
+    Homie.getLogger() << "Really goto sleep" << endl;   
     Homie.doDeepSleep(0UL, RF_DEFAULT);
     ESP.deepSleep(0UL, RF_DEFAULT);
   }
