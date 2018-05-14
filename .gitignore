@@ -1,2 +1,4 @@
 /layout_kicad/rescue-backup
 /layout_kicad/*.kicad_pcb-bak
+uploadSensorData/data/homie/config.json
+uploadSensorData/.vscode/settings.json
