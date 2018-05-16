@@ -8,28 +8,9 @@
             "args": [
                 "run",
                 "--target",
-                "uploadfs"
-            ],
-            "problemMatcher": [
-                "$platformio"
-            ]
-        },
-        {
-            "type": "PlatformIO",
-            "args": [
-                "remote",
-                "run",
+                "upload",
                 "--target",
-                "upload"
-            ],
-            "problemMatcher": [
-                "$platformio"
-            ]
-        },
-        {
-            "type": "PlatformIO",
-            "args": [
-                "test"
+                "monitor"
             ],
             "problemMatcher": [
                 "$platformio"

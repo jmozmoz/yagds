@@ -8,15 +8,17 @@ ADC_MODE(ADC_VCC);
 const unsigned int upperReed = 0;     // GPIO0
 const unsigned int lowerReed = 3;     // RX
 
-const unsigned int REED_INTERVAL = 2 * 1000UL;
-const unsigned int CONNECTION_TIMEOUT = 30 * 1000UL;
-const unsigned int SLEEP_TIMEOUT = 10 * 1000UL;
+HomieSetting<long> sensor_update_interval("sensor_update_interval", "interval for sensor updates");
+HomieSetting<long> connection_timeout("connection_timeout", "timeout for connection establishing");
+HomieSetting<long> sleep_timeout("sleep_timeout", "timeout for going to sleep");
+
+const unsigned int SENSOR_UPDATE_INTERVAL_DEFAULT = 2;
+const unsigned int CONNECTION_TIMEOUT_DEFAULT = 30;
+const unsigned int SLEEP_TIMEOUT_DEFAULT = 10;
 
 int publishTimerId;
 int connectionTimeoutId;
 int sleepTimeoutId;
-
-bool reachedSleepFlag = false;
 
 HomieNode reedNode("reeds", "state");
 HomieNode vccNode("powerSupply", "voltage");
@@ -25,7 +27,7 @@ SimpleTimer homieLoopTimer;
 SimpleTimer mainLoopTimer;
 
 void gotoDeepSleep() {
-    Homie.getLogger() << "Really goto sleep" << endl;   
+    Homie.getLogger() << F("Really goto sleep") << endl;   
     Homie.doDeepSleep(0UL, RF_DEFAULT);
     ESP.deepSleep(0UL, RF_DEFAULT);
 }
@@ -34,7 +36,7 @@ void checkGotoSleep(int upperReedState, int lowerReedState) {
   if (!upperReedState || !lowerReedState) {
     Homie.getLogger() << F("Prepare to sleep") << endl;
     homieLoopTimer.deleteTimer(publishTimerId);
-    sleepTimeoutId = mainLoopTimer.setTimeout(SLEEP_TIMEOUT, gotoDeepSleep);
+    sleepTimeoutId = mainLoopTimer.setTimeout(sleep_timeout.get() * 1000UL, gotoDeepSleep);
     Homie.prepareToSleep();
   }
 }
@@ -96,10 +98,14 @@ void setup() {
   Homie.setLoopFunction(loopHandler);
   Homie.onEvent(onHomieEvent);
 
-  publishTimerId = homieLoopTimer.setInterval(REED_INTERVAL, publishStates);
-  connectionTimeoutId = mainLoopTimer.setTimeout(CONNECTION_TIMEOUT, connectionTimedOut);
+  sensor_update_interval.setDefaultValue(SENSOR_UPDATE_INTERVAL_DEFAULT);
+  connection_timeout.setDefaultValue(CONNECTION_TIMEOUT_DEFAULT);
+  sleep_timeout.setDefaultValue(SLEEP_TIMEOUT_DEFAULT);
 
   Homie.setup();
+
+  publishTimerId = homieLoopTimer.setInterval(sensor_update_interval.get() * 1000UL, publishStates);
+  connectionTimeoutId = mainLoopTimer.setTimeout(connection_timeout.get() * 1000UL, connectionTimedOut);
 
 #if ASYNC_TCP_SSL_ENABLED
   Homie.getLogger() << endl << endl << F("ESP Homie Using TLS") << endl;
