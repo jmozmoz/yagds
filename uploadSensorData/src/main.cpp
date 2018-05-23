@@ -1,5 +1,6 @@
 #include <Homie.h>
 #include <SimpleTimer.h>
+#include <jled.h>
 
 #define MQTT_SERVER_FINGERPRINT {0xd6, 0x27, 0x18, 0xdd, 0x09, 0xce, 0x3d, 0x80, 0x1f, 0x59, 0x7a, 0x2b, 0x29, 0x78, 0x93, 0xe8, 0x0b, 0x82, 0x8a, 0x5d}
 
@@ -7,6 +8,9 @@ ADC_MODE(ADC_VCC);
 
 const unsigned int upperReed = 0;     // GPIO0
 const unsigned int lowerReed = 3;     // RX
+
+const unsigned int maxResendMessage = 3;
+unsigned int resendMessage = 0;
 
 HomieSetting<long> sensor_update_interval("sensor_update_interval", "interval for sensor updates");
 HomieSetting<long> connection_timeout("connection_timeout", "timeout for connection establishing");
@@ -26,6 +30,8 @@ HomieNode vccNode("powerSupply", "voltage");
 SimpleTimer homieLoopTimer;
 SimpleTimer mainLoopTimer;
 
+JLed led = JLed(LED_BUILTIN).LowActive();
+
 void gotoDeepSleep() {
     Homie.getLogger() << F("Really goto sleep") << endl;   
     Homie.doDeepSleep(0UL, RF_DEFAULT);
@@ -33,10 +39,13 @@ void gotoDeepSleep() {
 }
 
 void checkGotoSleep(int upperReedState, int lowerReedState) {
-  if (!upperReedState || !lowerReedState) {
+  if ((!upperReedState || !lowerReedState) &&
+      (Homie.getMqttClient().connected()) &&
+      (++resendMessage >= maxResendMessage)) {
     Homie.getLogger() << F("Prepare to sleep") << endl;
     homieLoopTimer.deleteTimer(publishTimerId);
     sleepTimeoutId = mainLoopTimer.setTimeout(sleep_timeout.get() * 1000UL, gotoDeepSleep);
+    led.Blink(100, 100).Forever();
     Homie.prepareToSleep();
   }
 }
@@ -65,6 +74,7 @@ void onHomieEvent(const HomieEvent& event) {
   switch(event.type) {
     case HomieEventType::MQTT_READY:
       mainLoopTimer.disable(connectionTimeoutId);
+      led.Blink(100, 900).Forever();
       break;
     case HomieEventType::MQTT_DISCONNECTED:
       mainLoopTimer.restartTimer(connectionTimeoutId);
@@ -81,14 +91,20 @@ void onHomieEvent(const HomieEvent& event) {
 
 void connectionTimedOut() {
   Homie.getLogger() << F("Initiate go to sleep, because connection timeout was reached") << endl;
+  led.Blink(500, 100).Forever();
   Homie.prepareToSleep();
 }
 
 void setup() {
+#ifdef SERIAL_LOG
   Homie.disableLedFeedback();
-  Homie.disableResetTrigger();  // we do not want to trigger config mode by sensor input
   Serial.begin(115200);
   Serial << endl << endl;
+#else
+  Homie.disableLogging();
+#endif
+
+  Homie.disableResetTrigger();  // we do not want to trigger config mode by sensor input
 
   pinMode(upperReed, INPUT);
   pinMode(lowerReed, INPUT_PULLUP);
@@ -116,6 +132,7 @@ void setup() {
 }
 
 void loop() {
+  led.Update();
   if (homieLoopTimer.getNumTimers()) {
       Homie.loop();
   }
