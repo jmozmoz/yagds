@@ -1,6 +1,8 @@
 #include <Homie.h>
 #include <SimpleTimer.h>
-#include <jled.h>
+#include <ESP8266WiFi.h>
+
+#include "debug_output.hpp"
 
 #define MQTT_SERVER_FINGERPRINT {0xd6, 0x27, 0x18, 0xdd, 0x09, 0xce, 0x3d, 0x80, 0x1f, 0x59, 0x7a, 0x2b, 0x29, 0x78, 0x93, 0xe8, 0x0b, 0x82, 0x8a, 0x5d}
 
@@ -19,6 +21,7 @@ HomieSetting<long> sleep_timeout("sleep_timeout", "timeout for going to sleep");
 const unsigned int SENSOR_UPDATE_INTERVAL_DEFAULT = 2;
 const unsigned int CONNECTION_TIMEOUT_DEFAULT = 30;
 const unsigned int SLEEP_TIMEOUT_DEFAULT = 10;
+const bool DEBUG_SERIAL_OUTPUT = false;
 
 int publishTimerId;
 int connectionTimeoutId;
@@ -30,7 +33,7 @@ HomieNode vccNode("powerSupply", "voltage");
 SimpleTimer homieLoopTimer;
 SimpleTimer mainLoopTimer;
 
-JLed led = JLed(LED_BUILTIN).LowActive();
+DebugOutput debugOutput;
 
 void gotoDeepSleep() {
     Homie.getLogger() << F("Really goto sleep") << endl;   
@@ -42,10 +45,9 @@ void checkGotoSleep(int upperReedState, int lowerReedState) {
   if ((!upperReedState || !lowerReedState) &&
       (Homie.getMqttClient().connected()) &&
       (++resendMessage >= maxResendMessage)) {
-    Homie.getLogger() << F("Prepare to sleep") << endl;
     homieLoopTimer.deleteTimer(publishTimerId);
     sleepTimeoutId = mainLoopTimer.setTimeout(sleep_timeout.get() * 1000UL, gotoDeepSleep);
-    led.Blink(100, 100).Forever();
+    debugOutput.checkGotoSleep();
     Homie.prepareToSleep();
   }
 }
@@ -74,7 +76,7 @@ void onHomieEvent(const HomieEvent& event) {
   switch(event.type) {
     case HomieEventType::MQTT_READY:
       mainLoopTimer.disable(connectionTimeoutId);
-      led.Blink(100, 900).Forever();
+      debugOutput.mqtt_ready();
       break;
     case HomieEventType::MQTT_DISCONNECTED:
       mainLoopTimer.restartTimer(connectionTimeoutId);
@@ -90,19 +92,12 @@ void onHomieEvent(const HomieEvent& event) {
 }
 
 void connectionTimedOut() {
-  Homie.getLogger() << F("Initiate go to sleep, because connection timeout was reached") << endl;
-  led.Blink(500, 100).Forever();
+  debugOutput.connectionTimedOut();
   Homie.prepareToSleep();
 }
 
 void setup() {
-#ifdef SERIAL_LOG
-  Homie.disableLedFeedback();
-  Serial.begin(115200);
-  Serial << endl << endl;
-#else
-  Homie.disableLogging();
-#endif
+  debugOutput.enable_serial(DEBUG_SERIAL_OUTPUT);
 
   Homie.disableResetTrigger();  // we do not want to trigger config mode by sensor input
 
@@ -117,6 +112,9 @@ void setup() {
   sensor_update_interval.setDefaultValue(SENSOR_UPDATE_INTERVAL_DEFAULT);
   connection_timeout.setDefaultValue(CONNECTION_TIMEOUT_DEFAULT);
   sleep_timeout.setDefaultValue(SLEEP_TIMEOUT_DEFAULT);
+  
+  WiFi.setPhyMode(WIFI_PHY_MODE_11N);
+  WiFi.setOutputPower(20.5);
 
   Homie.setup();
 
@@ -132,7 +130,7 @@ void setup() {
 }
 
 void loop() {
-  led.Update();
+  debugOutput.update();
   if (homieLoopTimer.getNumTimers()) {
       Homie.loop();
   }
