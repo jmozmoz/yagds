@@ -25,7 +25,7 @@ class MQTTHandler(threading.Thread):
 
     def on_connect(self, client, userdata, rc, _):
         logger.info('Connected with result code ' + str(rc))
-        self.mqttc.subscribe('outTopic')
+        self.mqttc.subscribe(self.config['topics_path'])
 
     def cancel(self):
         self.do_run = False
@@ -39,17 +39,20 @@ class MQTTHandler(threading.Thread):
             time.sleep(1)
         logger.info('mqtt not running anymore...')
 
-    def __init__(self, broker, ca, q):
+    def __init__(self, config, q):
         super().__init__()
         self.q = q
+        self.config = config
 
         self.mqttc = paho.Client()
+        self.mqttc.username_pw_set(self.config['username'],
+                                   self.config['password'])
         self.mqttc.on_message = self.on_message
         self.mqttc.on_connect = self.on_connect
-        self.mqttc.tls_set(ca)
+        self.mqttc.tls_set(os.path.expanduser(self.config['ca']))
 
-        logger.info('connecting to broker ' + broker)
-        self.mqttc.connect(broker, 8883, 60)
+        logger.info('connecting to broker ' + self.config['broker'])
+        self.mqttc.connect(self.config['broker'], 8883, 60)
         logger.info('connected')
 
         self.do_run = True
@@ -85,21 +88,22 @@ class TelegramBot(threading.Thread):
     def cancel(self):
         self.do_run = False
 
-    def __init__(self, token, chat_id, q):
+    def __init__(self, telegram_config, q):
         super().__init__()
         self.q = q
-        self.chat_id = chat_id
+        config = telegram_config
+        self.chat_id = str(config['chat_id'])
         self.do_run = True
 
         # Create the EventHandler and pass it your bot's token.
-        self.updater = Updater(token)
+        self.updater = Updater(config['token'])
 
         # Get the dispatcher to register handlers
         dp = self.updater.dispatcher
 
         # on different commands - answer in Telegram
         dp.add_handler(CommandHandler('start', self.on_start,
-                       Filters.user(user_id=chat_id)))
+                       Filters.user(user_id=self.chat_id)))
 
         # log all errors
         dp.add_error_handler(self.error)
@@ -128,15 +132,10 @@ def main():
     config = configparser.ConfigParser()
     config.read([args.conf_file])
 
-    ca = os.path.expanduser(config.get('MQTT', 'ca'))
-    broker = config.get('MQTT', 'broker')
-    token = config.get('Telegram', 'token')
-    chat_id = config.get('Telegram', 'chat_id')
-
     q = queue.Queue()
 
-    mqtt_handler = MQTTHandler(broker, ca, q)
-    telegram_bot = TelegramBot(token, chat_id, q)
+    mqtt_handler = MQTTHandler(config['MQTT'], q)
+    telegram_bot = TelegramBot(config['Telegram'], q)
 
     mqtt_handler.daemon = True
     telegram_bot.daemon = True
