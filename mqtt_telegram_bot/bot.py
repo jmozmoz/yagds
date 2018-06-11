@@ -21,7 +21,8 @@ class MQTTHandler(threading.Thread):
     def on_message(self, client, userdata, message):
         logger.debug('received message =' +
                      str(message.payload.decode('utf-8')))
-        self.q.put(message.payload.decode('utf-8'))
+        self.q.put(message.topic + ": " +
+                   message.payload.decode('utf-8'))
 
     def on_connect(self, client, userdata, rc, _):
         logger.info('Connected with result code ' + str(rc))
