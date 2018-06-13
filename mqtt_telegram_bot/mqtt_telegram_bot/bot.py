@@ -16,7 +16,6 @@ import queue
 import time
 
 from .garage_door_state_machine import GarageDoor
-from IPython.core import payload
 
 
 class MQTTHandler(threading.Thread):
