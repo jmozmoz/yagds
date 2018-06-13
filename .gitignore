@@ -3,3 +3,6 @@
 uploadSensorData/data/homie/config.json
 uploadSensorData/.vscode/settings.json
 /layout_kicad/*.bak
+/mqtt_telegram_bot/.pytest_cache
+/mqtt_telegram_bot/tests/__pycache__
+__pycache__
