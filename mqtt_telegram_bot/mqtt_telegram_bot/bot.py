@@ -15,14 +15,29 @@ import threading
 import queue
 import time
 
+from .garage_door_state_machine import GarageDoor
+from IPython.core import payload
+
 
 class MQTTHandler(threading.Thread):
     # define callback
     def on_message(self, client, userdata, message):
         logger.debug('received message =' +
                      str(message.payload.decode('utf-8')))
-        self.q.put(message.topic + ": " +
-                   message.payload.decode('utf-8'))
+
+        if message.topic == 'homie/door_sensor/reeds/lowerReed':
+            pl = message.payload.decode('utf-8')
+            if pl == '0':
+                self.garage_door.lower_reed_zero()
+            elif pl == '1':
+                self.garage_door.lower_reed_one()
+
+        if message.topic == 'homie/door_sensor/reeds/upperReed':
+            pl = message.payload.decode('utf-8')
+            if pl == '0':
+                self.garage_door.upper_reed_zero()
+            elif pl == '1':
+                self.garage_door.upper_reed_one()
 
     def on_connect(self, client, userdata, rc, _):
         logger.info('Connected with result code ' + str(rc))
@@ -42,7 +57,7 @@ class MQTTHandler(threading.Thread):
 
     def __init__(self, config, q):
         super().__init__()
-        self.q = q
+        self.garage_door = GarageDoor(lambda m: q.put(m))
         self.config = config
 
         self.mqttc = paho.Client()
