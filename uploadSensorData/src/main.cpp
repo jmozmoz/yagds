@@ -11,12 +11,13 @@ ADC_MODE(ADC_VCC);
 const unsigned int upperReed = 0;     // GPIO0
 const unsigned int lowerReed = 3;     // RX
 
-const unsigned int maxResendMessage = 3;
-unsigned int resendMessage = 0;
+const unsigned int DEFAULT_NUMBER_RESEND = 5;
+int resendMessage = 0;
 
 HomieSetting<long> sensor_update_interval("sensor_update_interval", "interval for sensor updates");
 HomieSetting<long> connection_timeout("connection_timeout", "timeout for connection establishing");
 HomieSetting<long> sleep_timeout("sleep_timeout", "timeout for going to sleep");
+HomieSetting<long> maxResendMessage("max_resend", "number of times message are sent before going to sleep");
 
 const unsigned int SENSOR_UPDATE_INTERVAL_DEFAULT = 2;
 const unsigned int CONNECTION_TIMEOUT_DEFAULT = 30;
@@ -44,7 +45,7 @@ void gotoDeepSleep() {
 void checkGotoSleep(int upperReedState, int lowerReedState) {
   if ((!upperReedState || !lowerReedState) &&
       (Homie.getMqttClient().connected()) &&
-      (++resendMessage >= maxResendMessage)) {
+      (++resendMessage >= maxResendMessage.get())) {
     homieLoopTimer.deleteTimer(publishTimerId);
     sleepTimeoutId = mainLoopTimer.setTimeout(sleep_timeout.get() * 1000UL, gotoDeepSleep);
     debugOutput.checkGotoSleep();
@@ -112,6 +113,7 @@ void setup() {
   sensor_update_interval.setDefaultValue(SENSOR_UPDATE_INTERVAL_DEFAULT);
   connection_timeout.setDefaultValue(CONNECTION_TIMEOUT_DEFAULT);
   sleep_timeout.setDefaultValue(SLEEP_TIMEOUT_DEFAULT);
+  maxResendMessage.setDefaultValue(DEFAULT_NUMBER_RESEND);
   
   WiFi.setPhyMode(WIFI_PHY_MODE_11N);
   WiFi.setOutputPower(20.5);
