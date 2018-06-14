@@ -21,7 +21,7 @@ class GarageDoor(object):
          'after': 'door_closed'
         },
         {'trigger': 'lower_reed_zero', 'source': ['closed'], 'dest': 'closed'},
-        {'trigger': 'lower_reed_zero', 'source': ['open', 'broken'], 'dest': 'moving',
+        {'trigger': 'lower_reed_zero', 'source': ['open', 'broken'], 'dest': 'broken',
          'after': 'broken_door'
         },
         {'trigger': 'upper_reed_one', 'source': ['open', 'broken'], 'dest': 'moving',

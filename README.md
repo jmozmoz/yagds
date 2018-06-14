@@ -29,6 +29,8 @@ Used libraries:
 ### Telegram Bot with state machine
 See folder [mqtt_telegram_bot](mqtt_telegram_bot/)
 
+![garage door states](/pics/my_state_diagram.png)
+
 Used libraries:
 * [Python Telegram Bot](https://pypi.org/project/python-telegram-bot/)
 * [paho-mqtt](https://pypi.org/project/paho-mqtt/)

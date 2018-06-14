@@ -60,3 +60,19 @@ class TestGarageDoor(object):
 
         garage_door.lower_reed_zero()
         assert garage_door.state == 'closed'
+
+    def test_open_to_cbroken(self, garage_door):
+        # force open state
+        garage_door.to_open()
+        assert garage_door.state == 'open'
+
+        garage_door.lower_reed_zero()
+        assert garage_door.state == 'broken'
+
+    def test_closed_to_cbroken(self, garage_door):
+        # force open state
+        garage_door.to_closed()
+        assert garage_door.state == 'closed'
+
+        garage_door.upper_reed_zero()
+        assert garage_door.state == 'broken'
