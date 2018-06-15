@@ -87,12 +87,56 @@ deep sleep state.
 LED debug output flashing patterns are generated using the library
 [jled](https://github.com/jandelgado/jled).
 
+To set the configuration, add the file `data/homie/config.json` and
+upload it the ESP-01 using Upload SPIFFS image.
+```
+{
+  "name": "YAGDS",
+  "device_id": "door_sensor",
+  "device_stats_interval": 60,
+  "wifi": {
+    "ssid": "xxx",
+    "password": "yyy"
+  },
+  "mqtt": {
+    "host": "alpha",
+    "port": 8883,
+    "base_topic": "homie/",
+    "auth": true,
+    "username": "aaa",
+    "password": "bbb",
+    "ssl": true,
+    "ssl_fingerprint": "123456789abcedf"
+  },
+  "ota": {
+    "enabled": false
+  },
+  "settings": {
+    "sensor_update_interval": 2,
+    "max_resend": 5,
+    "connection_timeout": 30,
+    "sleep_timeout": 10
+  }
+}
+```
+
+Known issues: 
+* My board is affected by this 
+[bug](https://github.com/marvinroger/homie-esp8266/issues/522), 
+which requires 
+[patching](https://github.com/esp8266/Arduino/issues/4061#issuecomment-368273656) 
+the ESP8266 core for Arduino.
+* To use SSL fingerprints for the connection between the ESP-01
+and a MQTT broker, a special build flag has to set: 
+`build_flags = -DASYNC_TCP_SSL_ENABLED=1`. Also consider this
+[issue](https://github.com/marvinroger/async-mqtt-client/issues/53).
+
 ### Telegram Bot with state machine
 A [Python script](mqtt_telegram_bot/) determines the state of
-the door and sends out messages if the state changes. 
-[paho-mqtt](https://pypi.org/project/paho-mqtt/) is used 
-to subscribe to the MQTT broker to receive the message from the ESP-01. 
-The transitions between different states of the door are followed 
+the door and sends out messages if the state changes.
+[paho-mqtt](https://pypi.org/project/paho-mqtt/) is used
+to subscribe to the MQTT broker to receive the message from the ESP-01.
+The transitions between different states of the door are followed
 using the library
 [transitions](https://pypi.org/project/transitions/). Message
 of the current signal of the reed contacts can trigger changes between
@@ -101,7 +145,25 @@ the different door states as shown in the picture below.
 
 If a transition causes a state change, also message is sent using the
 [Python Telegram Bot](https://pypi.org/project/python-telegram-bot/)
-library. 
+library.
+
+The `bot.py` scripts looks for the configuration file 
+`.mqtt_telegram_bot.ini` in the $HOME directory of the user, or
+for the file specified with the option `-c` at startup. It 
+contains information about the connection to the MQTT broker and the
+Telegram Bot.
+```
+[MQTT]
+broker = broker.address
+ca = ~/mqtt_ca.crt
+username = username
+password = password
+topics_path = homie/door_sensor/reeds/#
+
+[Telegram]
+token = TOKEN
+chat_id = 12345
+```
 
 ## Authors
 
