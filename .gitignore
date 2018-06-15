@@ -6,3 +6,4 @@ uploadSensorData/.vscode/settings.json
 /mqtt_telegram_bot/.pytest_cache
 /mqtt_telegram_bot/tests/__pycache__
 __pycache__
+/nppBackup
