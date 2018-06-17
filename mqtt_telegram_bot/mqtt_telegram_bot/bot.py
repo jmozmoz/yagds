@@ -107,7 +107,7 @@ class TelegramBot(threading.Thread):
         super().__init__()
         self.q = q
         config = telegram_config
-        self.chat_id = str(config['chat_id'])
+        self.chat_id = int(config['chat_id'])
         self.do_run = True
 
         # Create the EventHandler and pass it your bot's token.
