@@ -77,6 +77,8 @@ class TelegramBot(threading.Thread):
     def on_start(self, bot, update):
         """Send a message when the command /start is issued."""
         update.message.reply_text('Hi!')
+        if self._last_message:
+            update.message.reply_text(self._last_message)
         user = update.message.from_user
         logger.info('You talk with user {} and his user ID: {} '.format(
             user['username'], user['id']))
@@ -89,6 +91,7 @@ class TelegramBot(threading.Thread):
         while self.do_run:
             try:
                 message = self.q.get(timeout=1)
+                self._last_message = message
                 self.updater.bot.send_message(self.chat_id, text=message)
             except queue.Empty:
                 pass
@@ -109,6 +112,7 @@ class TelegramBot(threading.Thread):
         config = telegram_config
         self.chat_id = int(config['chat_id'])
         self.do_run = True
+        self._last_message = ''
 
         # Create the EventHandler and pass it your bot's token.
         self.updater = Updater(config['token'])
