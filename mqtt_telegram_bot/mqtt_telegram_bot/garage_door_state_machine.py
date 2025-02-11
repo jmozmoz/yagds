@@ -40,15 +40,19 @@ class GarageDoor(object):
         machine = Machine(model=self, states=GarageDoor.states,
                           transitions=GarageDoor.transitions, initial='moving')
         self.send = out_function
+        self.last_send = 1
 
     def door_open(self):
         self.send('door is now open')
+        self.last_send = 1
 
     def door_closed(self):
         self.send('door is now closed')
+        self.last_send = 1
 
     def start_moving(self):
         self.send('door started moving')
+        self.last_send = 1
 
     def broken_door(self):
         self.send('HELP!!! Door is broken')

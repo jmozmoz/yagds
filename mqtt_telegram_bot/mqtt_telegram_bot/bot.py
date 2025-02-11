@@ -1,8 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-from __future__ import division
-
 import os
 import argparse
 import configparser
@@ -21,8 +16,10 @@ from .garage_door_state_machine import GarageDoor
 class MQTTHandler(threading.Thread):
     # define callback
     def on_message(self, client, userdata, message):
-        logger.debug('received message =' +
-                     str(message.payload.decode('utf-8')))
+        logger.info('received message: ' +
+                    str(message.topic) +
+                    ' = ' +
+                    str(message.payload.decode('utf-8')))
 
         if message.topic == 'homie/door_sensor/reeds/lowerReed':
             pl = message.payload.decode('utf-8')
@@ -37,6 +34,14 @@ class MQTTHandler(threading.Thread):
                 self.garage_door.upper_reed_zero()
             elif pl == '1':
                 self.garage_door.upper_reed_one()
+        if message.topic == 'homie/door_sensor/powerSupply/voltage':
+            self.voltage = message.payload.decode('utf-8')
+
+        if message.topic == 'homie/door_sensor/$stats/signal':
+            self.signal_strength = message.payload.decode('utf-8')
+
+        if message.topic == 'messagehomie/door_sensor/$stats/uptime':
+            self.uptime = message.payload.decode('utf-8')
 
     def on_connect(self, client, userdata, rc, _):
         logger.info('Connected with result code ' + str(rc))
@@ -51,6 +56,13 @@ class MQTTHandler(threading.Thread):
         self.mqttc.loop_start()
         logger.info('mqtt running...')
         while self.do_run:
+            if self.garage_door.state != 'closed' and self.garage_door.last_send == 0:
+                self.garage_door.send(
+                    f'door state: {self.garage_door.state}'
+                )
+            self.garage_door.last_send = (
+                (self.garage_door.last_send + 1) % int(self.config['remind_interval'])
+            )
             time.sleep(1)
         logger.info('mqtt not running anymore...')
 
@@ -71,6 +83,9 @@ class MQTTHandler(threading.Thread):
         logger.info('connected')
 
         self.do_run = True
+        self.voltage = '0'
+        self.signal_strength = '0'
+        self.uptime = '0'
 
 
 class TelegramBot(threading.Thread):
@@ -92,6 +107,7 @@ class TelegramBot(threading.Thread):
             try:
                 message = self.q.get(timeout=1)
                 self._last_message = message
+                logger.info(f'Send message to telegram: {message}')
                 self.updater.bot.send_message(self.chat_id, text=message)
             except queue.Empty:
                 pass
