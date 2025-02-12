@@ -63,13 +63,24 @@ class MQTTHandler(threading.Thread):
             self.garage_door.last_send = (
                 (self.garage_door.last_send + 1) % int(self.config['remind_interval'])
             )
+
+            if not self.in_queue.empty():
+                new_state = self.in_queue.get()
+                if new_state == 'open':
+                    self.garage_door.to_open()
+                elif new_state == 'closed':
+                    self.garage_door.to_closed()
+                elif new_state == 'reconnect':
+                    self.mqttc.reconnect()
+
             time.sleep(1)
         logger.info('mqtt not running anymore...')
 
-    def __init__(self, config, q):
+    def __init__(self, config, q, qq):
         super().__init__()
         self.garage_door = GarageDoor(lambda m: q.put(m))
         self.config = config
+        self.in_queue = qq
 
         self.mqttc = paho.Client()
         self.mqttc.username_pw_set(self.config['username'],
@@ -89,7 +100,7 @@ class MQTTHandler(threading.Thread):
 
 
 class TelegramBot(threading.Thread):
-    def on_start(self, bot, update):
+    def on_start(self, update, context):
         """Send a message when the command /start is issued."""
         update.message.reply_text('Hi!')
         if self._last_message:
@@ -97,6 +108,26 @@ class TelegramBot(threading.Thread):
         user = update.message.from_user
         logger.info('You talk with user {} and his user ID: {} '.format(
             user['username'], user['id']))
+
+    def on_state(self, update, context):
+        """Explicitly set the state."""
+        update.message.reply_text('Set state')
+        user = update.message.from_user
+        if self._last_message:
+            update.message.reply_text(f'Old state: {self._last_message}')
+        args = context.args
+        logger.info(f'requested state: {args}')
+        if args and len(args) > 0:
+            if args[0] == 'closed' or args[0] == 'open':
+                self.out_queue.put(args[0])
+                update.message.reply_text(f'New state: {args[0]}')
+            else:
+                update.message.reply_text(f'invalid state: {args[0]}')
+
+    def on_reconnect(self, update, context):
+        """Reconnect to mqtt server to reset state to actual measured values."""
+        update.message.reply_text('Reconnect')
+        self.out_queue.put('reconnect')
 
     def error(self, bot, update, error):
         """Log Errors caused by Updates."""
@@ -122,9 +153,10 @@ class TelegramBot(threading.Thread):
     def cancel(self):
         self.do_run = False
 
-    def __init__(self, telegram_config, q):
+    def __init__(self, telegram_config, q, qq):
         super().__init__()
         self.q = q
+        self.out_queue = qq
         config = telegram_config
         self.chat_id = int(config['chat_id'])
         self.do_run = True
@@ -140,6 +172,11 @@ class TelegramBot(threading.Thread):
         dp.add_handler(CommandHandler('start', self.on_start,
                        Filters.user(user_id=self.chat_id)))
 
+        dp.add_handler(CommandHandler('state', self.on_state,
+                       Filters.user(user_id=self.chat_id)))
+
+        dp.add_handler(CommandHandler('reconnect', self.on_reconnect,
+                       Filters.user(user_id=self.chat_id)))
         # log all errors
         dp.add_error_handler(self.error)
 
@@ -168,9 +205,10 @@ def main():
     config.read([args.conf_file])
 
     q = queue.Queue()
+    qq = queue.Queue()
 
-    mqtt_handler = MQTTHandler(config['MQTT'], q)
-    telegram_bot = TelegramBot(config['Telegram'], q)
+    mqtt_handler = MQTTHandler(config['MQTT'], q, qq)
+    telegram_bot = TelegramBot(config['Telegram'], q, qq)
 
     mqtt_handler.daemon = True
     telegram_bot.daemon = True
