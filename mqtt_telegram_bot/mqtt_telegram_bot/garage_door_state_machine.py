@@ -36,11 +36,28 @@ class GarageDoor(object):
         {'trigger': 'lower_reed_one', 'source': ['open'], 'dest': 'open'},
     ]
 
-    def __init__(self, out_function=print):
+    def __init__(self, out_function=print, state_function=None):
+        """
+        out_function: called with a human readable message on relevant
+            state changes (e.g. sent to Telegram).
+        state_function: optional, called with the new state name
+            ('open', 'closed', 'moving', 'broken') whenever the state
+            actually changes (e.g. published to a retained MQTT topic).
+        """
         machine = Machine(model=self, states=GarageDoor.states,
-                          transitions=GarageDoor.transitions, initial='moving')
+                          transitions=GarageDoor.transitions, initial='moving',
+                          after_state_change='_publish_state')
         self.send = out_function
+        self.publish = state_function
         self.last_send = 1
+        self._last_published = None
+
+    def _publish_state(self):
+        # after_state_change also fires on reflexive transitions
+        # (e.g. open -> open); only publish real changes.
+        if self.publish and self.state != self._last_published:
+            self._last_published = self.state
+            self.publish(self.state)
 
     def door_open(self):
         self.send('door is now open')

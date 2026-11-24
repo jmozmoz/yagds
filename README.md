@@ -11,8 +11,10 @@ Bot notifies Telegram clients connected to it.
 ![carrier board schematics](/pics/system_design.svg)
 
 By using Telegram to distribute changes, the MQTT broker does not need to be
-accessible from the internet. Also the Android Telegram Bot supports Android
-Auto, so the garage door state can easily be sent to your car.
+accessible from the internet. In addition, the script publishes the current
+door state to a retained MQTT topic, so that Home Assistant can push it to
+the phone and into Android Auto (see
+[Android Auto via Home Assistant](#android-auto-via-home-assistant)).
 
 
 ## Hardware
@@ -159,11 +161,117 @@ ca = ~/mqtt_ca.crt
 username = username
 password = password
 topics_path = homie/door_sensor/reeds/#
+remind_interval = 300
+state_topic = yagds/door/state
 
 [Telegram]
 token = TOKEN
 chat_id = 12345
 ```
+
+`state_topic` is optional (default `yagds/door/state`). Every time the door
+state actually changes, the new state (`open`, `closed`, `moving` or
+`broken`) is published to this topic with QoS 1 and the retain flag set.
+Manual corrections via the Telegram command `/state open|closed` are
+published as well.
+
+### Android Auto via Home Assistant
+Since about May 2026 the official Telegram Android app no longer shows
+messages in Android Auto
+([Telegram bug 62558](https://bugs.telegram.org/c/62558)). To get the door
+state into the car again, Home Assistant is used as the delivery channel:
+
+```
+ESP-01 ──MQTT──► Mosquitto ◄──► bot.py (state machine)
+                     │             publishes yagds/door/state (retained)
+                     ▼
+              Home Assistant ──Firebase push──► HA Companion app ──► Android Auto
+```
+
+Home Assistant subscribes to the state topic and sends push notifications
+with `car_ui: true`, which makes them appear in Android Auto. The push goes
+out via Firebase Cloud Messaging, so the server only needs outbound internet
+access. The MQTT broker stays internal, and no VPN or open port is needed.
+The Telegram bot keeps running in parallel.
+
+#### Broker
+* The bot's Mosquitto user needs write access to `yagds/#`.
+* Create a separate Mosquitto user for Home Assistant with read access to
+  `yagds/#` (and `homie/door_sensor/#` if the raw values are wanted).
+
+#### Home Assistant
+Run Home Assistant as a container on the broker host, for example:
+```
+docker run -d --name homeassistant --restart=unless-stopped \
+  -e TZ=Europe/Berlin -v /opt/homeassistant:/config \
+  --network=host ghcr.io/home-assistant/home-assistant:stable
+```
+Add the MQTT integration (port 8883, Home Assistant's broker user). Under the
+advanced settings, set broker certificate validation to *Custom* and upload
+the broker's CA certificate. Then add the following to `configuration.yaml`:
+```yaml
+mqtt:
+  - sensor:
+      name: "Garage door"
+      unique_id: yagds_garage_door
+      state_topic: "yagds/door/state"
+      icon: mdi:garage
+
+automation:
+  - alias: "Garage door changed"
+    triggers:
+      - trigger: state
+        entity_id: sensor.garage_door
+        not_from: ["unknown", "unavailable"]
+    actions:
+      - action: notify.mobile_app_<your_phone>
+        data:
+          title: "Garage"
+          message: "Door is {{ trigger.to_state.state }}"
+          data:
+            car_ui: true
+            channel: "Garage"
+            importance: high
+            notification_icon: mdi:garage
+
+  - alias: "Garage door still open"
+    triggers:
+      - trigger: state
+        entity_id: sensor.garage_door
+        to: "open"
+        for: "00:10:00"
+    actions:
+      - action: notify.mobile_app_<your_phone>
+        data:
+          message: "Garage door open for 10 minutes"
+          data: { car_ui: true, channel: "Garage", importance: high }
+```
+The second automation does the same job as the bot's `remind_interval`
+reminder.
+
+#### Phone
+1. Install the **Home Assistant** app from the Play Store. The F-Droid
+   "minimal" build lacks Google Play services and does not work with
+   `car_ui` notifications.
+2. Connect it to Home Assistant while on the home Wi-Fi. This creates
+   `notify.mobile_app_<your_phone>`; use that name in the automations.
+3. After the first notification, enable pop-ups for the "Garage"
+   notification channel in Android's app settings for Home Assistant.
+4. Keep Home Assistant visible in the Android Auto launcher.
+5. Optional: add `sensor.garage_door` to the Android Auto favorites in the
+   Companion app settings. Note that this live view needs the phone to reach
+   Home Assistant (e.g. via Nabu Casa or a Cloudflare Tunnel); the
+   notifications do not.
+
+Firebase limits pushes to 500 per day per device, and notification content
+is not end-to-end encrypted. If notifications appear on the phone but not in
+the car, check the channel's pop-up setting, that Home Assistant is visible
+in the Android Auto launcher, and Android Auto's "show message
+notifications" setting.
+
+See the [Android Auto](https://companion.home-assistant.io/docs/android-auto/)
+and [notification](https://companion.home-assistant.io/docs/notifications/notifications-basic/)
+documentation of the Companion app for details.
 
 ## Authors
 

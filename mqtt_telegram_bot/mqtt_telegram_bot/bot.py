@@ -40,7 +40,7 @@ class MQTTHandler(threading.Thread):
         if message.topic == 'homie/door_sensor/$stats/signal':
             self.signal_strength = message.payload.decode('utf-8')
 
-        if message.topic == 'messagehomie/door_sensor/$stats/uptime':
+        if message.topic == 'homie/door_sensor/$stats/uptime':
             self.uptime = message.payload.decode('utf-8')
 
     def on_connect(self, client, userdata, rc, _):
@@ -78,8 +78,14 @@ class MQTTHandler(threading.Thread):
 
     def __init__(self, config, q, qq):
         super().__init__()
-        self.garage_door = GarageDoor(lambda m: q.put(m))
         self.config = config
+        self.state_topic = self.config.get('state_topic', 'yagds/door/state')
+        # self.mqttc is created below; the lambda is only evaluated on a
+        # state change, which happens after the client exists.
+        self.garage_door = GarageDoor(
+            lambda m: q.put(m),
+            lambda s: self.mqttc.publish(self.state_topic, s,
+                                         qos=1, retain=True))
         self.in_queue = qq
 
         self.mqttc = paho.Client()
