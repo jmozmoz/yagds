@@ -208,11 +208,23 @@ docker run -d --name homeassistant --restart=unless-stopped \
 ```
 Add the MQTT integration (port 8883, Home Assistant's broker user). Under the
 advanced settings, set broker certificate validation to *Custom* and upload
-the broker's CA certificate. Then add the following to `configuration.yaml`:
+the broker's CA certificate.
+
+The sensor and automations are kept in a
+[package](https://www.home-assistant.io/docs/configuration/packages/), so
+they do not clash with an existing `mqtt:` section or with
+`automation: !include automations.yaml` in `configuration.yaml`. Enable
+packages in `configuration.yaml` (add the `packages` line to the
+`homeassistant:` block, or add the block if there is none):
+```yaml
+homeassistant:
+  packages: !include_dir_named packages
+```
+Then create `packages/garage_door.yaml` next to `configuration.yaml`:
 ```yaml
 mqtt:
-  - sensor:
-      name: "Garage door"
+  sensor:
+    - name: "Garage door"
       unique_id: yagds_garage_door
       state_topic: "yagds/door/state"
       icon: mdi:garage
@@ -247,7 +259,10 @@ automation:
           data: { car_ui: true, channel: "Garage", importance: high }
 ```
 The second automation does the same job as the bot's `remind_interval`
-reminder.
+reminder. Home Assistant merges the package's `mqtt:` and `automation:`
+entries with those in `configuration.yaml`. Check the configuration
+(Developer tools > YAML) and restart Home Assistant to load the new package.
+Automations defined in a package are read-only in the UI editor.
 
 #### Phone
 1. Install the **Home Assistant** app from the Play Store. The F-Droid
