@@ -242,6 +242,7 @@ automation:
       - trigger: state
         entity_id: sensor.garage_door
         not_from: ["unknown", "unavailable"]
+        not_to: ["unknown", "unavailable"]
     actions:
       - action: notify.mobile_app_<your_phone>
         data:
@@ -273,7 +274,9 @@ Automations defined in a package are read-only in the UI editor.
 `mode: queued` makes sure that quick successive changes (e.g. `moving`
 followed by `closed` a moment later) each send a notification; with the
 default mode `single` the second one would be dropped while the first is
-still being sent.
+still being sent. `not_from`/`not_to` suppress notifications when the
+sensor becomes `unavailable` or `unknown` (e.g. while Home Assistant
+restarts or the connection to the broker is lost) and when it recovers.
 
 `sensor.garage_door` holds the exact state (`open`, `closed`, `moving`,
 `broken`). `binary_sensor.garage_door_open` is for display: with
@@ -282,8 +285,12 @@ and colors on its own. Everything except `closed` counts as open, so `moving`
 and `broken` show as open as well.
 
 Both entities can be found under Settings > Devices & services > Entities.
-To show them on the dashboard, add a card (Edit dashboard > Add card >
-Manual):
+To show them on a dashboard:
+1. Settings > Dashboards > Add dashboard > "New dashboard from scratch",
+   e.g. named "Garage" with icon `mdi:garage`.
+2. Open it from the sidebar, click the pencil icon to edit, then
+   "+ Add card" in a section.
+3. Pick "Manual" at the bottom of the card list and paste:
 ```yaml
 type: vertical-stack
 cards:
