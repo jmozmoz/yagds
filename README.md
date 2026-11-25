@@ -228,6 +228,12 @@ mqtt:
       unique_id: yagds_garage_door
       state_topic: "yagds/door/state"
       icon: mdi:garage
+  binary_sensor:
+    - name: "Garage door open"
+      unique_id: yagds_garage_door_open
+      state_topic: "yagds/door/state"
+      device_class: garage_door
+      value_template: "{{ 'OFF' if value == 'closed' else 'ON' }}"
 
 automation:
   - alias: "Garage door changed"
@@ -269,9 +275,32 @@ followed by `closed` a moment later) each send a notification; with the
 default mode `single` the second one would be dropped while the first is
 still being sent.
 
-The current state of `sensor.garage_door` can be seen under Settings >
-Devices & services > Entities (search for "Garage door"), or added to the
-dashboard as an entity card.
+`sensor.garage_door` holds the exact state (`open`, `closed`, `moving`,
+`broken`). `binary_sensor.garage_door_open` is for display: with
+`device_class: garage_door`, Home Assistant shows open/closed garage icons
+and colors on its own. Everything except `closed` counts as open, so `moving`
+and `broken` show as open as well.
+
+Both entities can be found under Settings > Devices & services > Entities.
+To show them on the dashboard, add a card (Edit dashboard > Add card >
+Manual):
+```yaml
+type: vertical-stack
+cards:
+  - type: tile
+    entity: binary_sensor.garage_door_open
+    name: Garage
+  - type: entities
+    entities:
+      - entity: sensor.garage_door
+        name: Exact state
+  - type: history-graph
+    hours_to_show: 24
+    entities:
+      - entity: binary_sensor.garage_door_open
+        name: Garage door
+```
+The dashboard is also shown in the Companion app.
 
 #### Phone
 1. Install the **Home Assistant** app from the Play Store. The F-Droid
