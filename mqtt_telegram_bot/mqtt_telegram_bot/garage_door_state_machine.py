@@ -50,7 +50,9 @@ class GarageDoor(object):
         self.send = out_function
         self.publish = state_function
         self.last_send = 1
-        self._last_published = None
+        # Start with the initial state, so that the retained reed values
+        # received at startup do not publish a spurious 'moving'.
+        self._last_published = self.state
 
     def _publish_state(self):
         # after_state_change also fires on reflexive transitions

@@ -108,6 +108,17 @@ class TestGarageDoorStatePublishing(object):
         garage_door.lower_reed_zero()
         assert published == ['open', 'broken']
 
+    def test_startup_closed_door(self, garage_door, published):
+        # retained reed values at startup: upper reed 1, lower reed 0
+        garage_door.upper_reed_one()
+        garage_door.lower_reed_zero()
+        assert published == ['closed']
+
+    def test_startup_open_door(self, garage_door, published):
+        garage_door.lower_reed_one()
+        garage_door.upper_reed_zero()
+        assert published == ['open']
+
     def test_reflexive_transition_not_republished(self, garage_door, published):
         garage_door.to_open()
         garage_door.upper_reed_zero()

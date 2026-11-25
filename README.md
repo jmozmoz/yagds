@@ -231,6 +231,7 @@ mqtt:
 
 automation:
   - alias: "Garage door changed"
+    mode: queued
     triggers:
       - trigger: state
         entity_id: sensor.garage_door
@@ -263,6 +264,14 @@ reminder. Home Assistant merges the package's `mqtt:` and `automation:`
 entries with those in `configuration.yaml`. Check the configuration
 (Developer tools > YAML) and restart Home Assistant to load the new package.
 Automations defined in a package are read-only in the UI editor.
+`mode: queued` makes sure that quick successive changes (e.g. `moving`
+followed by `closed` a moment later) each send a notification; with the
+default mode `single` the second one would be dropped while the first is
+still being sent.
+
+The current state of `sensor.garage_door` can be seen under Settings >
+Devices & services > Entities (search for "Garage door"), or added to the
+dashboard as an entity card.
 
 #### Phone
 1. Install the **Home Assistant** app from the Play Store. The F-Droid
